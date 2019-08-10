@@ -1,112 +1,138 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Security.AccessControl;
-using System.Text;
-using System.Windows;
 
-
-namespace TestConcole
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-
-        static void Main(string[] args)
-        {
-            string temp = "$";
-            string startupPath = System.IO.Directory.GetCurrentDirectory();
-            char curentDisk = startupPath[0];
-            string catalog = curentDisk + ":\\";
-            //Выбираем корень текущего диска    ###получаем переменную Windows с адресом текущего пользователя
-            string PatchProfile = catalog; //Environment.GetEnvironmentVariable("USERPROFILE");
-            //ищем все вложенные папки 
-            string[] S = SearchDirectory(PatchProfile);
-            //создаем строку в которой соберем все пути
-            string ListPatch = "найденные папки \n"; //заголовок для строк
-            foreach (string folderPatch in S)
-            {
-                if (HasWritePermissionOnDir(folderPatch) == true)
-                {
-                    int tempChar = folderPatch.IndexOf(temp);
-                    if (tempChar == -1)
-                    {
-                        //добавляем новую строку в список
-                        ListPatch += folderPatch + "\n";
-                        try
-                        {
-                            //пытаемся найти данные в папке 
-                            string[] F = SearchFile(folderPatch, "*.png");
-                            foreach (string FF in F)
-                            {
-
-                                //добавляем файл в список 
-                                ListPatch += FF + "\n";
-                            }
-                        }
-                        catch
-                        {
-                        }
-                    } else
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
-                    continue;
-                }
-            }
-            MessageBox.Show(ListPatch);
-        }
-        static string[] SearchDirectory(string patch)
-        {
-            
-                //находим все папки в по указанному пути
-                string[] ReultSearch = Directory.GetDirectories(patch);
-            
-                //возвращаем список директорий
-                return ReultSearch;
-            
-        }
-        static string[] SearchFile(string patch, string pattern) 
-        {
+        string savePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); //получаем путь к рабочему столу юзверя, запустившего программу
+        string machineName = Environment.MachineName; // получаем имя машины
         
-            //флаг SearchOption.AllDirectories означает искать во всех вложенных папках
-            string[] ReultSearch = Directory.GetFiles(patch, pattern, SearchOption.AllDirectories);
-                //возвращаем список найденных файлов соответствующих условию поиска 
-                return ReultSearch;
-           
+        string[] discSearch = Environment.GetLogicalDrives(); // список дисков
+        Console.Title = "GeoScanner";
+        Console.WriteLine("Текущая локальная машина - {0}", machineName);
+        Console.WriteLine("Место сохранения отчётов - {0}", savePath);
+        Console.WriteLine("Поиск по расширениям \n Вектор: shp, shx, dbf, prj, cbn, xml, MIF, MID, tab, kml, kmz, gps, map \n Растр: tif, tiff, jpg, jpeg, geotiff");
 
-        }
-
-        public static bool HasWritePermissionOnDir(string path)
+        Console.WriteLine("Обнаруженны следующие логические диски:");
+        for (int i = 0; i < discSearch.Length; i++)
         {
-            var writeAllow = false;
-            var writeDeny = false;
-            var accessControlList = Directory.GetAccessControl(path);
-            if (accessControlList == null)
-                return false;
-            var accessRules = accessControlList.GetAccessRules(true, true,
-                                        typeof(System.Security.Principal.SecurityIdentifier));
-            if (accessRules == null)
-                return false;
-
-            foreach (FileSystemAccessRule rule in accessRules)
-            {
-                if ((FileSystemRights.Write & rule.FileSystemRights) != FileSystemRights.Write)
-                    continue;
-
-                if (rule.AccessControlType == AccessControlType.Allow)
-                    writeAllow = true;
-                else if (rule.AccessControlType == AccessControlType.Deny)
-                    writeDeny = true;
-            }
-
-            return writeAllow && !writeDeny;
+            Console.WriteLine(discSearch[i]);
         }
-        
+        Console.WriteLine("Укажите минимальный рамзер файлов, байт:");
+        int fileSize = Int32.Parse(Console.ReadLine());
+        Console.WriteLine("Для начала поиска нажмите Enter");
+        Console.ReadLine();
+        Console.WriteLine("Start");
 
+        for (int i = 0; i < discSearch.Length; i++) // перебираем диски, ищем по дискам методом Search, лог создаётся для каждого диска отдельно
+        {
+            
+            string searchLoc = discSearch[i]; //
+            char disc = searchLoc[0]; // получаем символ диска для имени лога
+            string resultLogName = machineName + "_" + disc + ".csv"; // собираем  имя лога
+            string fullLogPath = savePath + "\\" + resultLogName; // получаем полное имя файла лога
+            Search(searchLoc, fullLogPath, machineName, fileSize);
+            //Console.WriteLine("При наличии результата, он записан в файл -  {0} \n Расположение - {1}", resultLogName, savePath); если писать нечего, файл не создаётся
+        }
+        Console.ReadLine();
 
     }
+    static void Search(string docPath, string fullLogPath, string pcName, int fileSize)
+        {
+
+        DirectoryInfo diTop = new DirectoryInfo(docPath);
+
+        try
+        {
+          
+
+            foreach (var di in diTop.EnumerateDirectories("*"))
+            {
+                try
+                {
+                    foreach (var fi in di.EnumerateFiles("*", SearchOption.AllDirectories))
+                    {
+                        try
+                        {
+                            string extension = Path.GetExtension(fi.FullName);//получаем расширение файла для сранения
+                            if(CheckExtension(extension) == true)
+                           // Перебираем все нужные расширения методом опроса в лоб %)
+                            
+                            {
+                                if (fi.Length > fileSize) // отсеиваем мелюзгу для ускорения тестов
+                                {
+                                    Console.WriteLine($"{fi.FullName}\t{fi.Length}\t{fi.Name}\t{fi.CreationTime}\t{fi.LastAccessTime}\t{fi.LastWriteTime}");
+
+                                    string text = $"\"{pcName}\";\"{fi.FullName}\";\"{fi.Length}\";\"{fi.CreationTime}\";\"{fi.LastWriteTime}\";\"{fi.LastAccessTime}\";\n";
+                                    using (FileStream fstream = new FileStream(fullLogPath, FileMode.Append)) // файл лога, создаём если нету, перезаписываем если есть
+                                    {
+                                        // преобразуем строку в байты
+                                        byte[] array = System.Text.Encoding.Default.GetBytes(text);
+                                        // запись массива байтов в файл
+                                        fstream.Write(array, 0, array.Length);
+                                        Console.WriteLine("Файл занесён в лог");
+                                    }
+                                }
+
+                            }
+                        }
+                        catch (UnauthorizedAccessException unAuthFile)
+                        {
+                            Console.WriteLine($"unAuthFile: {unAuthFile.Message}");
+                        }
+                        catch (System.IO.IOException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                    }
+                }
+                catch (UnauthorizedAccessException unAuthSubDir)
+                {
+                    Console.WriteLine($"unAuthSubDir: {unAuthSubDir.Message}");
+                }
+                catch (System.IO.IOException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+        catch (DirectoryNotFoundException dirNotFound)
+        {
+            Console.WriteLine($"{dirNotFound.Message}");
+        }
+        catch (UnauthorizedAccessException unAuthDir)
+        {
+            Console.WriteLine($"unAuthDir: {unAuthDir.Message}");
+        }
+        catch (PathTooLongException longPath)
+        {
+            Console.WriteLine($"{longPath.Message}");
+        }
+       
+
+        
+    }
+    
+    static bool CheckExtension(string extension) //перебираем как можем расширения
+    {
+        if((extension == ".jpg") || (extension == ".jpeg") ||
+           (extension == ".tiff") || (extension == ".geotiff") ||
+           (extension == ".tif") || (extension == ".shp") ||
+           (extension == ".shx") || (extension == ".dbf") ||
+           (extension == ".prj") || (extension == ".cbn") ||
+           (extension == ".xml") || (extension == ".MIF") ||
+           (extension == ".MID") || (extension == ".tab") ||
+           (extension == ".kml") || (extension == ".kmz") ||
+           (extension == ".gps") || (extension == ".map"))
+        { 
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+}
 }
 
+   
