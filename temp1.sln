@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29123.88
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "temp1", "temp1\temp1.csproj", "{81EAA2F0-7164-4BD8-9B3F-C40D889962AC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		GeoScanner|Any CPU = GeoScanner|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81EAA2F0-7164-4BD8-9B3F-C40D889962AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81EAA2F0-7164-4BD8-9B3F-C40D889962AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81EAA2F0-7164-4BD8-9B3F-C40D889962AC}.GeoScanner|Any CPU.ActiveCfg = GeoScanner|Any CPU
+		{81EAA2F0-7164-4BD8-9B3F-C40D889962AC}.GeoScanner|Any CPU.Build.0 = GeoScanner|Any CPU
+		{81EAA2F0-7164-4BD8-9B3F-C40D889962AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81EAA2F0-7164-4BD8-9B3F-C40D889962AC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9B04EC84-01C4-4882-AFBF-441E07DA093B}
+	EndGlobalSection
+EndGlobal

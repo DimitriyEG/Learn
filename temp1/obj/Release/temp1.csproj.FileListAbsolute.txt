@@ -1,0 +1,7 @@
+C:\Users\dim\source\repos\temp1\temp1\bin\Release\temp1.exe.config
+C:\Users\dim\source\repos\temp1\temp1\bin\Release\temp1.exe
+C:\Users\dim\source\repos\temp1\temp1\bin\Release\temp1.pdb
+C:\Users\dim\source\repos\temp1\temp1\obj\Release\temp1.csprojAssemblyReference.cache
+C:\Users\dim\source\repos\temp1\temp1\obj\Release\temp1.csproj.CoreCompileInputs.cache
+C:\Users\dim\source\repos\temp1\temp1\obj\Release\temp1.exe
+C:\Users\dim\source\repos\temp1\temp1\obj\Release\temp1.pdb
